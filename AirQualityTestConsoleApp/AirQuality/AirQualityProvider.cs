@@ -41,8 +41,11 @@ namespace AirQualityTestConsoleApp.AirQuality
                         return new AirQualityResponse(airQualityApiResponse.status, airQualityApiResponse.data?.ToString());
                     
                     // try to get required air quality value
-                    var value = (airQualityApiResponse.data as AirQualityData)?.forecast?.daily?.pm25?
-                        .FirstOrDefault(x => x.day.Date == DateTime.Today)?.avg;
+                    var airQualityData = airQualityApiResponse.data is JsonElement
+                        ? JsonSerializer.Deserialize<AirQualityData>(airQualityApiResponse.data.ToString())
+                        : airQualityApiResponse.data as AirQualityData;
+                    
+                    var value = airQualityData?.forecast?.daily?.pm25?.FirstOrDefault(x => x.day.Date == DateTime.Today)?.avg;
                     
                     if (value != null)
                     {
